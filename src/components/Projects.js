@@ -18,11 +18,16 @@ const Item = styled(Box)(({ theme }) => ({
 const Projects = () => {
   const [projects, setProjects] = useState(getProjects());
 
+  const favProjects = projects.filter((p) => p.favourite == true);
+  const favProjectsList = favProjects.sort(function (a, b) {
+    return a.favTime - b.favTime;
+  });
+  console.log(favProjectsList);
+
   const handleDelete = (project) => {
     const newProjects = projects.filter((p) => p._id !== project._id);
     setProjects(newProjects);
     const FavLength = newProjects.filter((p) => p.favourite == true).length;
-    console.log(FavLength);
   };
 
   const handleFavourite = (project) => {
@@ -30,16 +35,18 @@ const Projects = () => {
     const index = newProjects.indexOf(project);
     newProjects[index] = { ...newProjects[index] };
     const FavLength = newProjects.filter((p) => p.favourite == true).length;
-    console.log(FavLength);
 
     if (FavLength < 5) {
-      newProjects[index].favourite = true;
+      newProjects[index].favourite = !newProjects[index].favourite;
       setProjects(newProjects);
+      const date = new Date();
+      newProjects[index].favTime = date.getTime();
     } else {
-      newProjects[index].favourite = false;
-      setProjects(newProjects);
+      if ((newProjects[index].favourite = true)) {
+        newProjects[index].favourite = !newProjects[index].favourite;
+        setProjects(newProjects);
+      }
     }
-    //console.log(Date().toLocaleString());
   };
 
   return (

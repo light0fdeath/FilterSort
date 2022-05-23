@@ -6,6 +6,7 @@ const projects = [
     env: "production",
     status: "active",
     favourite: true,
+    favTime: 6,
   },
   {
     _id: "5b21ca3eeb7f6fbccd471816",
@@ -14,6 +15,7 @@ const projects = [
     env: "deployment",
     status: "inactive",
     favourite: true,
+    favTime: 3,
   },
   {
     _id: "5b21ca3eeb7f6fbccd471817",
@@ -22,6 +24,7 @@ const projects = [
     env: "production",
     status: "active",
     favourite: false,
+    favTime: 2,
   },
   {
     _id: "5b21ca3eeb7f6fbccd47181a",
@@ -30,6 +33,7 @@ const projects = [
     env: "production",
     status: "active",
     favourite: false,
+    favTime: 7,
   },
   {
     _id: "5b21ca3eeb7f6fbccd47171a",
@@ -38,6 +42,7 @@ const projects = [
     env: "production",
     status: "active",
     favourite: false,
+    favTime: 4,
   },
   {
     _id: "5b21ca3eeb7f6fbccd47281a",
@@ -46,6 +51,7 @@ const projects = [
     env: "production",
     status: "active",
     favourite: false,
+    favTime: 5,
   },
   {
     _id: "5b21ca3eeb7f6fbccd48181a",
@@ -54,6 +60,7 @@ const projects = [
     env: "production",
     status: "active",
     favourite: true,
+    favTime: 1,
   },
 ];
 
