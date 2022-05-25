@@ -1,68 +1,53 @@
-import React, { useState } from "react";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import { styled } from "@mui/material/styles";
-import { getProjects } from "../services/ProjectList";
-import Button from "@mui/material/Button";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Favourite from "./common/Favourite";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
+import React from "react";
 
-import Typography from "@mui/material/Typography";
-import Pagination from "@mui/material/Pagination";
-import Stack from "@mui/material/Stack";
-import _ from "lodash";
-
-const Item = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
-
-const Projects = () => {
+const dummy = () => {
   const [projects, setProjects] = useState(getProjects());
-  const [page, setPage] = React.useState(1);
   const [query, setQuery] = useState("");
-  const [paginate, setPaginate] = useState(
-    _(projects)
-      .slice(page - 1)
-      .take(3)
-      .value()
-  );
-  const pageSize = Math.ceil(projects.length / 3);
 
-  const handleSearchedProject = (query) => {
-    const newProjects = projects.filter((project) => {
-      if (query === "") {
-        return project;
-      } else if (project.title.toLowerCase().includes(query.toLowerCase())) {
-        return project;
-      }
-    });
+  //searchedProject = searchedProject.filter((p) => p.isArchived == false);
 
-    setProjects(newProjects);
-    setPaginate(
-      _(newProjects)
-        .slice((page - 1) * 3)
-        .take(3)
-        .value()
-    );
-    console.log(paginate);
+  const projectDetails = (project) => {
+    console.log(project);
   };
+
+  const handleArchive = () => {
+    defaultChecked = !defaultChecked;
+    if (defaultChecked == true) {
+      //console.log("Including handle archive");
+    } else {
+      //console.log("Excluding archive project");
+    }
+  };
+
+  const favProjects = projects.filter((p) => p.favourite == true);
+  const favProjectsList = favProjects.sort(function (a, b) {
+    return a.favTime - b.favTime;
+  });
+
+  //   Check for Archived
+
+  const includeArchivedProject = projects.filter((p) => {
+    if (defaultChecked) {
+      return projects;
+    } else if (projects.filter((p) => p.isArchived == false)) {
+      return projects;
+    }
+  });
+
+  //   Check for Search
+
+  var searchedProject = projects.filter((project) => {
+    if (query === "") {
+      return project;
+    } else if (project.title.toLowerCase().includes(query.toLowerCase())) {
+      return project;
+    }
+  });
+  console.log(favProjectsList);
 
   const handleDelete = (project) => {
     const newProjects = projects.filter((p) => p._id !== project._id);
     setProjects(newProjects);
-    setPaginate(
-      _(newProjects)
-        .slice((page - 1) * pageSize)
-        .take(3)
-        .value()
-    );
   };
 
   const handleFavourite = (project) => {
@@ -74,36 +59,14 @@ const Projects = () => {
     if (FavLength < 5) {
       newProjects[index].favourite = !newProjects[index].favourite;
       setProjects(newProjects);
-      setPaginate(
-        _(newProjects)
-          .slice((page - 1) * 3)
-          .take(3)
-          .value()
-      );
       const date = new Date();
       newProjects[index].favTime = date.getTime();
     } else {
       if ((newProjects[index].favourite = true)) {
         newProjects[index].favourite = !newProjects[index].favourite;
         setProjects(newProjects);
-        setPaginate(
-          _(newProjects)
-            .slice((page - 1) * 3)
-            .take(3)
-            .value()
-        );
       }
     }
-  };
-
-  const handleChange = (event, value) => {
-    setPage(value);
-    console.log(pageSize);
-    const paginate = _(projects)
-      .slice((value - 1) * 3)
-      .take(3)
-      .value();
-    setPaginate(paginate);
   };
   return (
     <Box sx={{ width: "100%" }} spacing={5}>
@@ -111,6 +74,8 @@ const Projects = () => {
         Projects
       </Button>
       <Stack spacing={2}>
+        {/* <Typography>Page: {data[`${page - 1}`]}</Typography> */}
+        <Typography>Page: {fruits}</Typography>
         <Pagination
           count={pageSize}
           page={page}
@@ -124,8 +89,17 @@ const Projects = () => {
         label="Search For Projects"
         variant="standard"
         sx={{ mb: 5 }}
-        onChange={(event) => handleSearchedProject(event.target.value)}
+        onChange={(event) => setQuery(event.target.value)}
+      />{" "}
+      {/* <FormControlLabel
+    control={
+      <Checkbox
+        defaultChecked
+        onClick={() => handleArchive(defaultChecked)}
       />
+    }
+    label="Include Archived Project"
+  /> */}
       <Grid
         container
         spacing={2}
@@ -164,7 +138,7 @@ const Projects = () => {
         </Grid>
       </Grid>
       <br></br>
-      {paginate.map((project) => (
+      {searchedProject.map((project) => (
         <>
           <Grid
             container
@@ -173,7 +147,9 @@ const Projects = () => {
             alignItems="center"
             key={project._id}>
             <Grid item xs={2}>
-              <Item>{project.title}</Item>
+              <Item onClick={() => projectDetails(project)}>
+                {project.title}
+              </Item>
             </Grid>
             <Grid item xs={2}>
               <Item>{project.numOfFlows}</Item>
@@ -208,4 +184,4 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default dummy;
