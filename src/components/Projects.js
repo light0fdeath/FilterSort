@@ -37,6 +37,11 @@ const Projects = () => {
   const [paginate, setPaginate] = useState([]);
   const FavLength = projects.filter((p) => p.favourite == true).length;
 
+  const favProjects = projects.filter((p) => p.favourite == true);
+  const favProjectsList = favProjects.sort(function (a, b) {
+    return a.favTime - b.favTime;
+  });
+
   const handleEnvChange = (event) => {
     setEnv(event.target.value);
   };
