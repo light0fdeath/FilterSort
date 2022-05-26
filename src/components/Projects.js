@@ -9,9 +9,12 @@ import Favourite from "./common/Favourite";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-
 import Typography from "@mui/material/Typography";
 import Pagination from "@mui/material/Pagination";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import _ from "lodash";
 
@@ -24,22 +27,41 @@ const Item = styled(Box)(({ theme }) => ({
 }));
 
 const Projects = () => {
+  const count = 5;
+  const [env, setEnv] = useState("");
+  const [checked, setChecked] = useState(false);
+  const [status, setStatus] = useState("");
   const [projects, setProjects] = useState(getProjects());
   const [page, setPage] = React.useState(1);
-  const [pageSize, setPageSize] = useState(Math.ceil(projects.length / 3));
+  const [pageSize, setPageSize] = useState(Math.ceil(projects.length / count));
   const [query, setQuery] = useState("");
+  const [paginate, setPaginate] = useState([]);
+  const FavLength = projects.filter((p) => p.favourite == true).length;
 
-  const [paginate, setPaginate] = useState(
-    _(projects)
-      .slice(page - 1)
-      .take(3)
-      .value()
+  const handleEnvChange = (event) => {
+    setEnv(event.target.value);
+  };
+
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
+  };
+
+  const handleArchive = (event) => {
+    setChecked(event.target.checked);
+  };
+
+  var projectData = projects.filter(
+    (project) =>
+      (project.env == env || env == "") &&
+      (project.status == status || status == "") &&
+      project.isArchived == checked
   );
 
-  var searchedProject = projects.filter((project) => {
+  var searchedProject = projectData.filter((project) => {
+    const data = project.title.toLowerCase().includes(query.toLowerCase());
     if (query === "") {
       return project;
-    } else if (project.title.toLowerCase().includes(query.toLowerCase())) {
+    } else if (data) {
       return project;
     }
   });
@@ -48,94 +70,128 @@ const Projects = () => {
     setPaginate(
       _(searchedProject)
         .slice((page - 1) * pageSize)
-        .take(3)
+        .take(count)
         .value()
     );
     setPage(1);
-    setPageSize(Math.ceil(searchedProject.length / 3));
+    setPageSize(Math.ceil(searchedProject.length / count));
     setProjects(projects);
-  }, [query]);
+  }, [query, env, status, checked]);
 
   const handleChange = (event, value) => {
     setPage(value);
     setPaginate(
       _(searchedProject)
-        .slice((value - 1) * 3)
-        .take(3)
+        .slice((value - 1) * count)
+        .take(count)
         .value()
     );
   };
 
   const handleDelete = (project) => {
-    const newProjectsDelete = searchedProject.filter(
+    const searchedProjectDelete = searchedProject.filter(
       (p) => p._id !== project._id
     );
     const newProjects = projects.filter((p) => p._id !== project._id);
-    setPageSize(Math.ceil(newProjects.length / 3));
     setPaginate(
-      _(newProjectsDelete)
-        .slice((page - 1) * 3)
-        .take(3)
+      _(searchedProjectDelete)
+        .slice((page - 1) * count)
+        .take(count)
         .value()
     );
-    setPageSize(Math.ceil((searchedProject.length - 1) / 3));
-    console.log(searchedProject);
+    setPageSize(Math.ceil((searchedProject.length - 1) / count));
     setProjects(newProjects);
   };
 
   const handleFavourite = (project) => {
     const index = projects.indexOf(project);
-
-    const FavLength = projects.filter((p) => p.favourite == true).length;
-    console.log(FavLength);
-
-    if (FavLength < 5) {
+    if (FavLength < 5 || (projects[index].favourite = true)) {
       projects[index].favourite = !projects[index].favourite;
-      setProjects(projects);
-      setPaginate(
-        _(searchedProject)
-          .slice((page - 1) * 3)
-          .take(3)
-          .value()
-      );
-      const date = new Date();
-      projects[index].favTime = date.getTime();
-    } else {
-      if ((projects[index].favourite = true)) {
-        projects[index].favourite = !projects[index].favourite;
-        setProjects(projects);
-        setPaginate(
-          _(searchedProject)
-            .slice((page - 1) * 3)
-            .take(3)
-            .value()
-        );
-      }
     }
-    console.log(projects);
+    setPaginate(
+      _(searchedProject)
+        .slice((page - 1) * count)
+        .take(count)
+        .value()
+    );
+    setProjects(projects);
+    const date = new Date();
+    projects[index].favTime = date.getTime();
   };
 
   return (
     <Box sx={{ width: "100%" }} spacing={5}>
-      <Button variant="contained" spacing={2} sx={{ mb: 5 }}>
+      <Button variant="contained" spacing={2} sx={{ m: 5 }}>
         Projects
       </Button>
-      <Stack spacing={2}>
-        <Pagination
-          count={pageSize}
-          page={page}
-          onChange={handleChange}
-          color="secondary"
-        />
-      </Stack>
+
       <br />
-      <TextField
-        id="standard-basic"
-        label="Search For Projects"
-        variant="standard"
-        sx={{ mb: 5 }}
-        onChange={(event) => setQuery(event.target.value)}
-      />
+
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={3}>
+          <TextField
+            id="standard-basic"
+            label="Search For Projects"
+            variant="standard"
+            sx={{ mb: 5 }}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Environment</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={env}
+              label="Environement"
+              onChange={handleEnvChange}>
+              <MenuItem value={"production"}>Prod</MenuItem>
+              <MenuItem value={"dev"}>Dev</MenuItem>
+              <MenuItem value={"server"}>Server</MenuItem>
+              <MenuItem value={""}>Clear Selected</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={2}>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label-status">Status</InputLabel>
+            <Select
+              labelId="demo-simple-select-label-status"
+              id="demo-simple-select-status"
+              value={status}
+              label="Environement"
+              onChange={handleStatusChange}>
+              <MenuItem value={"active"}>Active</MenuItem>
+              <MenuItem value={"inactive"}>Inactive</MenuItem>
+              <MenuItem value={""}>Clear Status</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={3}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checked}
+                onChange={handleArchive}
+                inputProps={{ "aria-label": "controlled" }}
+              />
+            }
+            label="Include Archived Projects"
+          />
+        </Grid>
+      </Grid>
+      <Grid item xs={4}>
+        <Stack spacing={2} sx={{ mb: 5 }}>
+          <Pagination
+            count={pageSize}
+            page={page}
+            onChange={handleChange}
+            color="secondary"
+          />
+        </Stack>
+      </Grid>
+
       <Grid
         container
         spacing={2}
