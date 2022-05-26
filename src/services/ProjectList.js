@@ -1,3 +1,5 @@
+import { TurnSharpLeftOutlined } from "@mui/icons-material";
+
 const projects = [
   {
     _id: "5b21ca3eeb7f6fbccd471815",
@@ -87,7 +89,7 @@ const projects = [
     status: "active",
     favourite: false,
     favTime: 8,
-    isArchived: false,
+    isArchived: TurnSharpLeftOutlined,
   },
   {
     _id: "5b23ca4eeb7f6fbccd48181a",
@@ -127,7 +129,7 @@ const projects = [
     status: "active",
     favourite: false,
     favTime: 8,
-    isArchived: false,
+    isArchived: true,
   },
   {
     _id: "5b237a3eeb266fbccd48181a",
@@ -157,7 +159,7 @@ const projects = [
     status: "inactive",
     favourite: false,
     favTime: 12,
-    isArchived: false,
+    isArchived: true,
   },
   {
     _id: "5b237a33eb756fbccd48181a",
@@ -167,7 +169,7 @@ const projects = [
     status: "active",
     favourite: false,
     favTime: 13,
-    isArchived: false,
+    isArchived: true,
   },
 ];
 

@@ -54,7 +54,7 @@ const Projects = () => {
     (project) =>
       (project.env == env || env == "") &&
       (project.status == status || status == "") &&
-      project.isArchived == checked
+      (checked ? true : project.isArchived)
   );
 
   var searchedProject = projectData.filter((project) => {
