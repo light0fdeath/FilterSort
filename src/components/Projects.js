@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { styled } from "@mui/material/styles";
@@ -26,85 +26,95 @@ const Item = styled(Box)(({ theme }) => ({
 const Projects = () => {
   const [projects, setProjects] = useState(getProjects());
   const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = useState(Math.ceil(projects.length / 3));
   const [query, setQuery] = useState("");
+
   const [paginate, setPaginate] = useState(
     _(projects)
       .slice(page - 1)
       .take(3)
       .value()
   );
-  const pageSize = Math.ceil(projects.length / 3);
 
-  const handleSearchedProject = (query) => {
-    const newProjects = projects.filter((project) => {
-      if (query === "") {
-        return project;
-      } else if (project.title.toLowerCase().includes(query.toLowerCase())) {
-        return project;
-      }
-    });
+  var searchedProject = projects.filter((project) => {
+    if (query === "") {
+      return project;
+    } else if (project.title.toLowerCase().includes(query.toLowerCase())) {
+      return project;
+    }
+  });
 
-    setProjects(newProjects);
+  useEffect(() => {
     setPaginate(
-      _(newProjects)
-        .slice((page - 1) * 3)
-        .take(3)
-        .value()
-    );
-    console.log(paginate);
-  };
-
-  const handleDelete = (project) => {
-    const newProjects = projects.filter((p) => p._id !== project._id);
-    setProjects(newProjects);
-    setPaginate(
-      _(newProjects)
+      _(searchedProject)
         .slice((page - 1) * pageSize)
         .take(3)
         .value()
     );
+    setPage(1);
+    setPageSize(Math.ceil(searchedProject.length / 3));
+    setProjects(projects);
+  }, [query]);
+
+  const handleChange = (event, value) => {
+    setPage(value);
+    setPaginate(
+      _(searchedProject)
+        .slice((value - 1) * 3)
+        .take(3)
+        .value()
+    );
+  };
+
+  const handleDelete = (project) => {
+    const newProjectsDelete = searchedProject.filter(
+      (p) => p._id !== project._id
+    );
+    const newProjects = projects.filter((p) => p._id !== project._id);
+    setPageSize(Math.ceil(newProjects.length / 3));
+    setPaginate(
+      _(newProjectsDelete)
+        .slice((page - 1) * 3)
+        .take(3)
+        .value()
+    );
+    setPageSize(Math.ceil((searchedProject.length - 1) / 3));
+    console.log(searchedProject);
+    setProjects(newProjects);
   };
 
   const handleFavourite = (project) => {
-    const newProjects = [...projects];
-    const index = newProjects.indexOf(project);
-    newProjects[index] = { ...newProjects[index] };
-    const FavLength = newProjects.filter((p) => p.favourite == true).length;
+    const index = projects.indexOf(project);
+
+    const FavLength = projects.filter((p) => p.favourite == true).length;
+    console.log(FavLength);
 
     if (FavLength < 5) {
-      newProjects[index].favourite = !newProjects[index].favourite;
-      setProjects(newProjects);
+      projects[index].favourite = !projects[index].favourite;
+      setProjects(projects);
       setPaginate(
-        _(newProjects)
+        _(searchedProject)
           .slice((page - 1) * 3)
           .take(3)
           .value()
       );
       const date = new Date();
-      newProjects[index].favTime = date.getTime();
+      projects[index].favTime = date.getTime();
     } else {
-      if ((newProjects[index].favourite = true)) {
-        newProjects[index].favourite = !newProjects[index].favourite;
-        setProjects(newProjects);
+      if ((projects[index].favourite = true)) {
+        projects[index].favourite = !projects[index].favourite;
+        setProjects(projects);
         setPaginate(
-          _(newProjects)
+          _(searchedProject)
             .slice((page - 1) * 3)
             .take(3)
             .value()
         );
       }
     }
+    console.log(projects);
   };
 
-  const handleChange = (event, value) => {
-    setPage(value);
-    console.log(pageSize);
-    const paginate = _(projects)
-      .slice((value - 1) * 3)
-      .take(3)
-      .value();
-    setPaginate(paginate);
-  };
   return (
     <Box sx={{ width: "100%" }} spacing={5}>
       <Button variant="contained" spacing={2} sx={{ mb: 5 }}>
@@ -124,7 +134,7 @@ const Projects = () => {
         label="Search For Projects"
         variant="standard"
         sx={{ mb: 5 }}
-        onChange={(event) => handleSearchedProject(event.target.value)}
+        onChange={(event) => setQuery(event.target.value)}
       />
       <Grid
         container
